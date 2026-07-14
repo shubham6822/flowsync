@@ -1,65 +1,108 @@
 import Image from "next/image";
 
+import { CopyButton } from "./components/copy-button";
+import { InView } from "./components/motion/in-view";
+import { StepsList } from "./components/steps-list";
+import { TerminalDemo } from "./components/terminal-demo";
+import { DiaTextReveal } from "./components/ui/dia-text-reveal";
+import { Highlighter } from "./components/ui/highlighter";
+import { LINKS, SITE, TOOLS } from "./data";
+
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-6 pb-16 pt-10 sm:pt-14">
+      {/* 1 · Header */}
+      <header>
+        <h1 id="wordmark" className="text-3xl font-semibold tracking-tight">
+          <DiaTextReveal text={SITE.name} />
+          {/* The reveal starts from transparent text, so without JS the
+              wordmark would never appear. */}
+          <noscript>
+            <style>{`#wordmark span { color: var(--foreground) !important; }`}</style>
+          </noscript>
+        </h1>
+        <p className="text-zinc-500">{SITE.tagline}</p>
+      </header>
+
+      <main className="flex flex-col gap-10 pt-12">
+        {/* 2 · Intro */}
+        <p className="text-zinc-600">{SITE.intro}</p>
+
+        {/* 3 · Install */}
+        <InView>
+          <section aria-label="Install">
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 py-2 pl-4 pr-2">
+              <code className="overflow-x-auto font-mono text-[13px] text-zinc-900">
+                {SITE.installCommand}
+              </code>
+              <CopyButton text={SITE.installCommand} />
+            </div>
+          </section>
+        </InView>
+
+        {/* 4 · Terminal demo */}
+        <InView>
+          <TerminalDemo />
+        </InView>
+
+        {/* 5 · How it works. The heading stays outside InView: rough-notation
+            measures the element when it draws, and a mid-flight translate on
+            an ancestor puts the annotation at the wrong coordinates. */}
+        <section>
+          <h2 className="mb-4 text-sm font-medium text-zinc-900">
+            <Highlighter action="highlight" color="#f59e0b66" isView>
+              How it works
+            </Highlighter>
+          </h2>
+          <InView>
+            <StepsList />
+          </InView>
+        </section>
+
+        {/* 6 · Works with */}
+        <InView>
+          <section>
+            <h2 className="mb-4 text-sm font-medium text-zinc-900">
+              Works with
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {TOOLS.map((tool) => (
+                <span
+                  key={tool.name}
+                  className="group flex items-center border border-dotted border-zinc-300 p-3"
+                >
+                  <Image src={tool.icon} alt={tool.name} width={20} height={20} />
+                  {/* Collapsed via max-width so the square expands smoothly on hover. */}
+                  <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm text-zinc-600 transition-all duration-300 group-hover:ml-2 group-hover:max-w-40">
+                    {tool.name}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <p className="mt-3 text-sm text-zinc-500">
+              Each tool is one adapter — more on the way.
+            </p>
+          </section>
+        </InView>
       </main>
+
+      {/* 7 · Footer */}
+      <footer className="mt-14 border-t border-zinc-100 pt-6">
+        <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+          <span>© 2026 flowsync</span>
+          {LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-zinc-600 hover:underline"
+            >
+              {link.label}
+            </a>
+          ))}
+        </p>
+      </footer>
     </div>
   );
 }
