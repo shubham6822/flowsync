@@ -14,17 +14,14 @@ export default function Home() {
       {/* 1 · Header */}
       <header>
         <h1 id="wordmark" className="text-3xl font-semibold tracking-tight">
-          <DiaTextReveal text={SITE.name} />
-          {/* The reveal starts from transparent text, so without JS the
-              wordmark would never appear. */}
-          <noscript>
-            <style>{`#wordmark span { color: var(--foreground) !important; }`}</style>
-          </noscript>
+          {/* sweepOnly: the wordmark is always visible; only the gradient
+              band sweeps across it. That also makes it render without JS. */}
+          <DiaTextReveal text={SITE.name} sweepOnly replayOnHover />
         </h1>
         <p className="text-zinc-500">{SITE.tagline}</p>
       </header>
 
-      <main className="flex flex-col gap-10 pt-12">
+      <main className="flex flex-col gap-10 pt-10">
         {/* 2 · Intro */}
         <p className="text-zinc-600">{SITE.intro}</p>
 
@@ -71,7 +68,8 @@ export default function Home() {
                   key={tool.name}
                   className="group flex cursor-pointer items-center border border-dotted border-zinc-300 p-3"
                 >
-                  <Image src={tool.icon} alt={tool.name} width={20} height={20} />
+                  {/* h-5 w-auto keeps non-square marks (Cursor) at their real ratio. */}
+                  <Image src={tool.icon} alt={tool.name} width={20} height={20} className="h-5 w-auto" />
                   {/* Collapsed via max-width so the square expands smoothly on hover. */}
                   <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm text-zinc-600 transition-all duration-300 group-hover:ml-2 group-hover:max-w-40">
                     {tool.name}
@@ -87,21 +85,25 @@ export default function Home() {
       </main>
 
       {/* 7 · Footer */}
-      <footer className="mt-14 border-t border-zinc-100 pt-6">
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
-          <span>© 2026 flowsync</span>
-          {LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noreferrer"
-              className="transition-colors hover:text-zinc-600 hover:underline"
-            >
-              {link.label}
-            </a>
-          ))}
-        </p>
+      <footer className="mt-10 border-t border-zinc-100 pt-6">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-zinc-400">© 2026 flowsync</p>
+          <div className="flex items-center gap-3">
+            {LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={link.label}
+                title={link.label}
+                className="opacity-60 transition-opacity hover:opacity-100"
+              >
+                <Image src={link.icon} alt={link.label} width={16} height={16} className="h-4 w-auto" />
+              </a>
+            ))}
+          </div>
+        </div>
       </footer>
     </div>
   );

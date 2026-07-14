@@ -26,7 +26,15 @@ const SWEEP_END = 100 + BAND_HALF
 const sweepEase = (t: number) =>
   t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2
 
-function buildGradient(pos: number, colors: string[], textColor: string) {
+function buildGradient(
+  pos: number,
+  colors: string[],
+  textColor: string,
+  // Local addition: color ahead of the sweep band. Upstream hardcodes
+  // "transparent" (text appears as the band passes); passing textColor keeps
+  // the text always visible with the band just sweeping over it.
+  tailColor: string = "transparent"
+) {
   const bandStart = pos - BAND_HALF
   const bandEnd = pos + BAND_HALF
 
@@ -45,7 +53,7 @@ function buildGradient(pos: number, colors: string[], textColor: string) {
   })
 
   if (bandEnd < 100)
-    parts.push(`transparent ${bandEnd.toFixed(2)}%`, `transparent 100%`)
+    parts.push(`${tailColor} ${bandEnd.toFixed(2)}%`, `${tailColor} 100%`)
 
   return `linear-gradient(90deg, ${parts.join(", ")})`
 }
@@ -127,6 +135,17 @@ export interface DiaTextRevealProps extends Omit<
    * @defaultValue `false`
    */
   fixedWidth?: boolean
+  /**
+   * Local addition: keep the text visible the whole time and only sweep the
+   * gradient band across it, instead of revealing the text from transparent.
+   * @defaultValue `false`
+   */
+  sweepOnly?: boolean
+  /**
+   * Local addition: replay the sweep whenever the pointer enters the text.
+   * @defaultValue `false`
+   */
+  replayOnHover?: boolean
 }
 
 export function DiaTextReveal({
@@ -141,6 +160,8 @@ export function DiaTextReveal({
   once = true,
   className,
   fixedWidth = false,
+  sweepOnly = false,
+  replayOnHover = false,
   ...props
 }: DiaTextRevealProps) {
   const texts = Array.isArray(text) ? text : [text]
@@ -169,6 +190,7 @@ export function DiaTextReveal({
 
   const indexRef = useRef(0)
   const hasPlayedRef = useRef(false)
+  const isPlayingRef = useRef(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const playRef = useRef<() => void>(null!)
   const stopRef = useRef<(() => void) | null>(null)
@@ -179,7 +201,12 @@ export function DiaTextReveal({
   const sweepPos = useMotionValue(SWEEP_START)
 
   const backgroundImage = useTransform(sweepPos, (pos) =>
-    buildGradient(pos, optsRef.current.colors, optsRef.current.textColor)
+    buildGradient(
+      pos,
+      optsRef.current.colors,
+      optsRef.current.textColor,
+      sweepOnly ? optsRef.current.textColor : "transparent"
+    )
   )
 
   const isInView = useInView(spanRef, { once, amount: 0.1 })
@@ -194,12 +221,14 @@ export function DiaTextReveal({
     const { duration, delay, repeat, repeatDelay, texts } = optsRef.current
 
     sweepPos.set(SWEEP_START)
+    isPlayingRef.current = true
 
     const controls = animate(sweepPos, SWEEP_END, {
       duration,
       delay,
       ease: sweepEase,
       onComplete() {
+        isPlayingRef.current = false
         if (!repeat) return
         timerRef.current = setTimeout(() => {
           const next = (indexRef.current + 1) % texts.length
@@ -211,6 +240,12 @@ export function DiaTextReveal({
     })
 
     stopRef.current = () => controls.stop()
+  }
+
+  // Local addition: replay the sweep on hover, ignoring hovers mid-sweep.
+  const handleMouseEnter = () => {
+    if (!replayOnHover || prefersReducedMotion || isPlayingRef.current) return
+    playRef.current()
   }
 
   useEffect(() => {
@@ -261,6 +296,7 @@ export function DiaTextReveal({
       animate={animatedW != null ? { width: animatedW } : undefined}
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       {...props}
+      onMouseEnter={replayOnHover ? handleMouseEnter : props.onMouseEnter}
     >
       {texts[activeIndex]}
     </motion.span>

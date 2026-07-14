@@ -245,6 +245,7 @@ export const Terminal = ({
   startOnView = true,
 }: TerminalProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const preRef = useRef<HTMLPreElement | null>(null)
   const isInView = useInView(containerRef as React.RefObject<Element>, {
     amount: 0.3,
     once: true,
@@ -252,6 +253,25 @@ export const Terminal = ({
 
   const [activeIndex, setActiveIndex] = useState(0)
   const sequenceHasStarted = sequence ? !startOnView || isInView : false
+
+  // Local addition: follow the output — keep the newest *visible* line at the
+  // bottom edge, like a real terminal. Scrolling to scrollHeight would jump
+  // past it into lines that haven't faded in yet (they occupy layout space
+  // at opacity 0), leaving the viewport apparently empty.
+  useEffect(() => {
+    const el = preRef.current
+    const code = el?.querySelector(":scope > code")
+    if (!el || !code) return
+    const items = code.children
+    const item = items[Math.min(activeIndex, items.length - 1)] as
+      | HTMLElement
+      | undefined
+    if (!item) return
+    const itemBottom =
+      item.getBoundingClientRect().bottom - code.getBoundingClientRect().top
+    const target = Math.max(0, itemBottom - el.clientHeight + 16)
+    el.scrollTo({ top: target, behavior: "smooth" })
+  }, [activeIndex])
 
   const contextValue = useMemo<SequenceContextValue | null>(() => {
     if (!sequence) return null
@@ -279,18 +299,23 @@ export const Terminal = ({
       ref={containerRef}
       className={cn(
         // Palette adapted from shadcn tokens to this project's zinc scale.
-        "z-0 h-full max-h-100 w-full max-w-lg rounded-xl border border-zinc-200 bg-zinc-50",
+        // flex-col + min-h-0 pre let a fixed height (via className) give the
+        // output area an internal scrollbar instead of growing the card.
+        "z-0 flex h-full max-h-100 w-full max-w-lg flex-col rounded-xl border border-zinc-200 bg-zinc-50",
         className
       )}
     >
-      <div className="flex flex-col gap-y-2 border-b border-zinc-200 p-4">
+      <div className="flex flex-col gap-y-2 border-b border-zinc-800 p-4">
         <div className="flex flex-row gap-x-2">
           <div className="h-2 w-2 rounded-full bg-red-500"></div>
           <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
           <div className="h-2 w-2 rounded-full bg-green-500"></div>
         </div>
       </div>
-      <pre className="overflow-x-auto p-4 text-[13px]">
+      <pre
+        ref={preRef}
+        className="min-h-0 flex-1 overflow-auto p-4 text-[13px] [scrollbar-color:#3f3f46_transparent] [scrollbar-width:thin]"
+      >
         <code className="grid gap-y-1">{wrappedChildren}</code>
       </pre>
     </div>

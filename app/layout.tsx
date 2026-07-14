@@ -13,11 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "flowsync — sync your AI coding setup",
+  title: "flowsync — move your AI coding setup between machines and repos",
   description:
     "flowsync scans your Claude Code, Codex and Cursor configuration and moves it to any machine or repo with one command. Secrets are excluded by default.",
   openGraph: {
-    title: "flowsync — sync your AI coding setup",
+    title: "flowsync — move your AI coding setup between machines and repos",
     description:
       "Scan, push and pull your AI coding configuration across machines. Secrets are excluded by default.",
     siteName: "flowsync",
