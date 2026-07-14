@@ -69,7 +69,7 @@ export default function Home() {
               {TOOLS.map((tool) => (
                 <span
                   key={tool.name}
-                  className="group flex items-center border border-dotted border-zinc-300 p-3"
+                  className="group flex cursor-pointer items-center border border-dotted border-zinc-300 p-3"
                 >
                   <Image src={tool.icon} alt={tool.name} width={20} height={20} />
                   {/* Collapsed via max-width so the square expands smoothly on hover. */}

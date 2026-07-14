@@ -20,7 +20,7 @@ export function CopyButton({ text }: { text: string }) {
       type="button"
       onClick={copy}
       aria-label={copied ? "Copied" : "Copy install command"}
-      className="rounded-md p-1.5 text-zinc-400 transition-colors hover:text-zinc-700"
+      className="cursor-pointer rounded-md p-1.5 text-zinc-400 transition-colors hover:text-zinc-700"
     >
       {copied ? (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
