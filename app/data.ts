@@ -6,23 +6,103 @@ export const SITE = {
   installCommand: "npm install -g flowsync-cli",
 };
 
+/**
+ * The install one-liner per package manager — tabs in the install block
+ * (shadcn-style). First entry is the default tab.
+ */
+export const INSTALL_COMMANDS = [
+  { manager: "npm", command: "npm install -g flowsync-cli" },
+  { manager: "pnpm", command: "pnpm add -g flowsync-cli" },
+  { manager: "yarn", command: "yarn global add flowsync-cli" },
+  { manager: "bun", command: "bun add -g flowsync-cli" },
+] as const;
+
 export const STEPS = [
   {
-    command: "flowsync scan",
+    command: "flowsync login",
     description:
-      "Inventories your Claude Code, Codex and Cursor config at user and project scope.",
+      "Log in once in your browser with a one-time device code.",
     soon: false,
   },
   {
     command: "flowsync push",
     description:
-      "You pick the artifacts; anything credential-shaped is excluded by default.",
+      "Scans your config and you pick what to send; anything credential-shaped is excluded by default.",
     soon: false,
   },
   {
     command: "flowsync pull",
-    description: "Restore everything on a new machine.",
-    soon: true,
+    description: "Restore everything on a new machine or repo.",
+    soon: false,
+  },
+] as const;
+
+/**
+ * The full command reference — every flowsync-cli command, grouped the way the
+ * CLI's own `--help` orders them: the sync workflow first, then account
+ * management. Descriptions mirror each command's `summary`/`details` in
+ * flowsync-cli (src/commands/<name>/index.ts) so the page never drifts from
+ * what the tool actually does. `usage` is the one-line invocation hint.
+ */
+export interface Command {
+  command: string;
+  usage: string;
+  description: string;
+}
+export interface CommandGroup {
+  title: string;
+  commands: Command[];
+}
+
+export const COMMAND_GROUPS: CommandGroup[] = [
+  {
+    title: "Sync workflow",
+    commands: [
+      {
+        command: "scan",
+        usage: "flowsync scan [--scope user|project|all] [--tool <id>]",
+        description:
+          "Detect your Claude Code, Codex and Cursor tools and inventory their config at user and project scope — classifying every artifact as portable, machine-local or secret-bearing.",
+      },
+      {
+        command: "push",
+        usage: "flowsync push [--scope …] [--tool <id>]",
+        description:
+          "Pick which scanned configs to send to your flowsync account. Portable artifacts are pre-checked; anything credential-shaped is excluded unless you opt in. Requires login.",
+      },
+      {
+        command: "pull",
+        usage: "flowsync pull [--scope …] [--tool <id>] [--force] [--share <code>]",
+        description:
+          "Restore your pushed setup onto this machine or repo. Additive — existing files and MCP servers are skipped, never deleted, unless you pass --force.",
+      },
+      {
+        command: "share",
+        usage: "flowsync share [--scope …] [--tool <id>]",
+        description:
+          "Turn one config — a file, a whole skill, or an MCP server — into an npx one-liner anyone can pull. Links expire after 7 days; machine-local and secret-bearing configs can't be shared.",
+      },
+    ],
+  },
+  {
+    title: "Account",
+    commands: [
+      {
+        command: "login",
+        usage: "flowsync login",
+        description: "Log in to flowsync in your browser with a one-time device code.",
+      },
+      {
+        command: "logout",
+        usage: "flowsync logout",
+        description: "Revoke and remove the stored session on this machine.",
+      },
+      {
+        command: "whoami",
+        usage: "flowsync whoami",
+        description: "Print the currently logged-in account.",
+      },
+    ],
   },
 ] as const;
 
@@ -31,6 +111,12 @@ export const TOOLS = [
   { name: "OpenAI Codex", icon: "/tools/codex.svg" },
   { name: "Cursor", icon: "/tools/cursor.svg" },
 ] as const;
+
+/** The footer's "Report a bug" button — goes straight to GitHub issues. */
+export const REPORT_BUG = {
+  label: "Report a bug",
+  href: "https://github.com/shubham6822/flowsync/issues",
+} as const;
 
 /** Icon-only footer links; label is the accessible name and hover tooltip. */
 export const LINKS = [

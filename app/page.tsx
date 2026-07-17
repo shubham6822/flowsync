@@ -1,25 +1,20 @@
 import Image from "next/image";
+import Link from "next/link";
 
-import { CopyButton } from "./components/copy-button";
+import { InstallCommand } from "./components/install-command";
 import { InView } from "./components/motion/in-view";
+import { SiteFooter } from "./components/site-footer";
+import { SiteHeader } from "./components/site-header";
 import { StepsList } from "./components/steps-list";
 import { TerminalDemo } from "./components/terminal-demo";
-import { DiaTextReveal } from "./components/ui/dia-text-reveal";
 import { Highlighter } from "./components/ui/highlighter";
-import { LINKS, SITE, TOOLS } from "./data";
+import { SITE, TOOLS } from "./data";
 
 export default function Home() {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-6 pb-16 pt-10 sm:pt-14">
       {/* 1 · Header */}
-      <header>
-        <h1 id="wordmark" className="text-3xl font-semibold tracking-tight">
-          {/* sweepOnly: the wordmark is always visible; only the gradient
-              band sweeps across it. That also makes it render without JS. */}
-          <DiaTextReveal text={SITE.name} sweepOnly replayOnHover />
-        </h1>
-        <p className="text-zinc-500">{SITE.tagline}</p>
-      </header>
+      <SiteHeader />
 
       <main className="flex flex-col gap-10 pt-10">
         {/* 2 · Intro */}
@@ -28,12 +23,7 @@ export default function Home() {
         {/* 3 · Install */}
         <InView>
           <section aria-label="Install">
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50 py-2 pl-4 pr-2">
-              <code className="overflow-x-auto font-mono text-[13px] text-zinc-900">
-                {SITE.installCommand}
-              </code>
-              <CopyButton text={SITE.installCommand} />
-            </div>
+            <InstallCommand />
           </section>
         </InView>
 
@@ -46,11 +36,22 @@ export default function Home() {
             measures the element when it draws, and a mid-flight translate on
             an ancestor puts the annotation at the wrong coordinates. */}
         <section>
-          <h2 className="mb-4 text-sm font-medium text-zinc-900">
-            <Highlighter action="highlight" color="#f59e0b66" isView>
-              How it works
-            </Highlighter>
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-medium text-zinc-900">
+              <Highlighter action="highlight" color="#f59e0b66" isView>
+                How it works
+              </Highlighter>
+            </h2>
+            <Link
+              href="/docs"
+              className="group flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
+            >
+              more info
+              <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
+                →
+              </span>
+            </Link>
+          </div>
           <InView>
             <StepsList />
           </InView>
@@ -85,26 +86,7 @@ export default function Home() {
       </main>
 
       {/* 7 · Footer */}
-      <footer className="mt-10 border-t border-zinc-100 pt-6">
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-400">© 2026 flowsync</p>
-          <div className="flex items-center gap-3">
-            {LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={link.label}
-                title={link.label}
-                className="opacity-60 transition-opacity hover:opacity-100"
-              >
-                <Image src={link.icon} alt={link.label} width={16} height={16} className="h-4 w-auto" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
