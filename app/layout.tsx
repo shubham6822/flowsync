@@ -13,15 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "flowsync — move your AI coding setup between machines and repos",
-  description:
-    "flowsync scans your Claude Code, Codex and Cursor configuration and moves it to any machine or repo with one command. Secrets are excluded by default.",
+  metadataBase: new URL("https://flowsync.dev"),
+  title: "flowsync",
+  description: "flowsync scans your Claude Code, Codex and Cursor configuration and moves it to any machine or repo with one command. Secrets are excluded by default.",
+  icons: {
+    icon: "/flowsync-logo.jpg",
+    shortcut: "/flowsync-logo.jpg",
+    apple: "/flowsync-logo.jpg",
+  },
   openGraph: {
     title: "flowsync — move your AI coding setup between machines and repos",
-    description:
-      "Scan, push and pull your AI coding configuration across machines. Secrets are excluded by default.",
+    description: "Scan, push and pull your AI coding configuration across machines. Secrets are excluded by default.",
     siteName: "flowsync",
     type: "website",
+    images: ["/flowsync-logo.jpg"],
   },
 };
 
@@ -31,13 +36,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col bg-white text-zinc-900">
-        {children}
-      </body>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-white text-zinc-900">{children}</body>
     </html>
   );
 }

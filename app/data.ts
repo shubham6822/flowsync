@@ -19,12 +19,6 @@ export const INSTALL_COMMANDS = [
 
 export const STEPS = [
   {
-    command: "flowsync login",
-    description:
-      "Log in once in your browser with a one-time device code.",
-    soon: false,
-  },
-  {
     command: "flowsync push",
     description:
       "Scans your config and you pick what to send; anything credential-shaped is excluded by default.",
@@ -33,6 +27,12 @@ export const STEPS = [
   {
     command: "flowsync pull",
     description: "Restore everything on a new machine or repo.",
+    soon: false,
+  },
+  {
+    command: "flowsync share",
+    description:
+      "Turn one config into an npx one-liner anyone can pull.",
     soon: false,
   },
 ] as const;
